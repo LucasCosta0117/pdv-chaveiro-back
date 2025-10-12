@@ -204,4 +204,7 @@ $RECYCLE.BIN/
 #npm -lock.json
 package-lock.json
 
+#evita o Maven build directory
+target/
+
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,node,linux,windows
