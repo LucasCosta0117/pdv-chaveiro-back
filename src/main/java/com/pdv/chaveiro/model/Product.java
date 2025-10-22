@@ -16,22 +16,22 @@ public class Product {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(length = 45, nullable = false)
+  @Column(length = 100, nullable = false)
   private String name;
 
-  @Column(length = 45)
+  @Column(length = 50)
   private String brand;
 
-  @Column(length = 45)
+  @Column(length = 50)
   private String code;
 
-  @Column(length = 45)
+  @Column(length = 50)
   private String department;
 
-  @Column(length = 45)
+  @Column(length = 50)
   private String category;
 
-  @Column(length = 45)
+  @Column(length = 50)
   private String subcategory;
 
   @Column
