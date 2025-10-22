@@ -1,12 +1,15 @@
 package com.pdv.chaveiro.model;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.validation.constraints.Min;
 
 @Entity
@@ -54,6 +57,12 @@ public class Product {
   @Column(name = "is_deleted", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
   private Boolean isDeleted = false;
 
+  @Column(name = "created_at", updatable = false)
+  private LocalDateTime createdAt;
+
+  @Column(name = "updated_at")
+  private LocalDateTime updatedAt;
+
   // Getters e Setters
   public Long getId() { return id; }
   public void setId(Long id) { this.id = id; }
@@ -93,4 +102,15 @@ public class Product {
 
   public Boolean getIsDeleted() { return isDeleted; }
   public void setIsDeleted(Boolean isDeleted) { this.isDeleted = isDeleted; }
+
+  @PrePersist
+  protected void onCreate() {
+    this.createdAt = LocalDateTime.now();
+    this.updatedAt = LocalDateTime.now();
+  }
+
+  @PreUpdate
+  protected void onUpdate() {
+    this.updatedAt = LocalDateTime.now();
+  }
 }
