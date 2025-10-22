@@ -207,4 +207,7 @@ package-lock.json
 #evita o Maven build directory
 target/
 
+# Script's personalizados
+*.sh
+
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,node,linux,windows
