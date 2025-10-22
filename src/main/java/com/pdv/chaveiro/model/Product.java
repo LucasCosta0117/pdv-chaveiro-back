@@ -11,104 +11,126 @@ import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.validation.constraints.Min;
+import lombok.Data;
 
+/**
+ * Representa um Produto (product) vendido pelo estabelicimento comercial.
+ * <p>Esta entidade mapeia a tabela de produtos, contendo atributos como preço e categoria,
+ * e é uma das bases para o registro de transações no PDV.</p>
+ * 
+ * @author Lucas Costa
+ * @version 1.0.0
+ */
 @Entity
+@Data
 public class Product {
 
+  /**
+   * Identificador único (Primary Key) da entidade. Gerado automaticamente pelo banco de dados.
+   */
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  /**
+   * Nome descritivo do produto
+   */
   @Column(length = 100, nullable = false)
   private String name;
 
+  /**
+   * Marca do produto para identificação.
+   */
   @Column(length = 50)
   private String brand;
 
+  /**
+   * Código interno de referência ou SKU do produto.
+   */
   @Column(length = 50)
   private String code;
 
+  /**
+   * Departamento para divisão macro do produto.
+   */
   @Column(length = 50)
   private String department;
 
+  /**
+   * Categoria principal do produto.
+   */
   @Column(length = 50)
   private String category;
 
+  /**
+   * Subcategoria do produto para granularidade.
+   */
   @Column(length = 50)
   private String subcategory;
 
+  /**
+   * Preço padrão do produto.
+   * <p>Restrição: Não pode ser negativo (validação @Min(0)).</p>
+   */
   @Column
   @Min(value = 0, message = "Price value cannot be negative")
   private BigDecimal price;
 
+  /**
+   * Quantidade do produto disponível para venda.
+   */
   @Column
   @Min(value = 0, message = "Stock quantity cannot be negative")
   private Integer stock;
 
+  /**
+   * URL do banco de arquivos da imagem do produto.
+   */
   @Column(name = "img_url", columnDefinition = "TEXT")
   private String imgUrl;
 
+  /**
+   * Indica se o produto está disponível para venda no PDV.
+   */
   @Column(name = "can_sale")
   private Boolean canSale;
 
+  /**
+   * Indica se o produto está ativo no PDV.
+   */
   @Column(name = "is_active", nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
   private Boolean isActive = true;
 
+  /**
+   * Flag de exclusão lógica (soft delete).
+   */
   @Column(name = "is_deleted", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
   private Boolean isDeleted = false;
 
+  /**
+   * Carimbo de data/hora de criação do registro. Definido automaticamente no PrePersist.
+   */
   @Column(name = "created_at", updatable = false)
   private LocalDateTime createdAt;
 
+  /**
+   * Carimbo de data/hora da última atualização do registro. Definido automaticamente no PreUpdate.
+   */
   @Column(name = "updated_at")
   private LocalDateTime updatedAt;
 
-  // Getters e Setters
-  public Long getId() { return id; }
-  public void setId(Long id) { this.id = id; }
-
-  public String getName() { return name; }
-  public void setName(String name) { this.name = name; }
-
-  public String getBrand() { return brand; }
-  public void setBrand(String brand) { this.brand = brand; }
-
-  public String getCode() { return code; }
-  public void setCode(String code) { this.code = code; }
-
-  public String getDepartment() { return department; }
-  public void setDepartment(String department) { this.department = department; }
-
-  public String getCategory() { return category; }
-  public void setCategory(String category) { this.category = category; }
-
-  public String getSubcategory() { return subcategory; }
-  public void setSubcategory(String subcategory) { this.subcategory = subcategory; }
-
-  public BigDecimal getPrice() { return price; }
-  public void setPrice(BigDecimal price) { this.price = price; }
-
-  public Integer getStock() { return stock; }
-  public void setStock(Integer stock) { this.stock = stock; }
-
-  public String getImgUrl() { return imgUrl; }
-  public void setImgUrl(String imgUrl) { this.imgUrl = imgUrl; }
-
-  public Boolean getCanSale() { return canSale; }
-  public void setCanSale(Boolean canSale) { this.canSale = canSale; }
-
-  public Boolean getIsActive() { return isActive; }
-  public void setIsActive(Boolean isActive) { this.isActive = isActive; }
-
-  public Boolean getIsDeleted() { return isDeleted; }
-  public void setIsDeleted(Boolean isDeleted) { this.isDeleted = isDeleted; }
-
+  /**
+   * Define a data de criação e atualização antes da persistência no banco de dados.
+   */
   @PrePersist
   protected void onCreate() {
     this.createdAt = LocalDateTime.now();
     this.updatedAt = LocalDateTime.now();
   }
 
+  /**
+   * Atualiza o carimbo de data/hora de 'updatedAt' antes de qualquer atualização no banco de dados.
+   */
   @PreUpdate
   protected void onUpdate() {
     this.updatedAt = LocalDateTime.now();
