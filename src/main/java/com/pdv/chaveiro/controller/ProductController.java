@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.pdv.chaveiro.model.MockProduct;
 import com.pdv.chaveiro.model.Product;
 import com.pdv.chaveiro.service.ProductService;
 
@@ -23,16 +22,8 @@ public class ProductController {
     productServ = productService;
   }
 
-  // @GetMapping("/all") 
-  // public List<Product> getAllProducts() {
-  //   return productServ.getAll();
-  // }
-
-  /**
-   * @todo REMOVER. Mock para teste da API
-   */
   @GetMapping("/all") 
-  public List<MockProduct> getAllProducts() {
+  public List<Product> getAllProducts() {
     return productServ.getAll();
   }
 }
