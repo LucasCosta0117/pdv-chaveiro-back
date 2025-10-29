@@ -1,5 +1,7 @@
 package com.pdv.chaveiro.repository;
 
+import java.util.UUID;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -14,6 +16,6 @@ import com.pdv.chaveiro.model.Job;
  * @version 1.0.0
  */
 @Repository
-public interface JobRepository extends JpaRepository <Job, Long>{
+public interface JobRepository extends JpaRepository <Job, UUID>{
   // Utilizando métodos nativos JpaRepository. Nenhum método adicional/customizado por enquanto
 }
