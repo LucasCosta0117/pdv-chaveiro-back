@@ -1,0 +1,117 @@
+package com.pdv.chaveiro.model;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import lombok.Data;
+
+/**
+ * Representa uma Venda (sale) seja de produto ou serviço realizado pelo estabelicimento.
+ * <p>Esta entidade mapeia a tabela de vendas, contendo atributos como total, itens vendidos e metodos de pagamentos,
+ * e é a principal base do registro de transações no PDV.</p>
+ * 
+ * @author Lucas Costa
+ * @version 1.0.0
+ */
+@Entity
+@Data
+public class Sale {
+  /**
+   * Identificador único (Primary Key) da entidade. Gerado automaticamente pelo banco de dados.
+   */
+  @Id
+  @GeneratedValue
+  private UUID id;
+
+  /**
+   * Total da venda sem considerar os descontos.
+   */
+  @Column
+  private BigDecimal subtotal;
+
+  /**
+   * Total dos descontos aplicads na venda.
+   */
+  @Column(name = "total_discount")
+  private BigDecimal totalDiscount;
+
+  /**
+   * Total da venda considerando o total dos descontos.
+   */
+  @Column
+  private BigDecimal total;
+
+  /**
+   * Registra o status da ordem de venda.
+   */
+  @Column(name="payment_status", nullable = false)
+  private PaymentStatus paymentStatus = PaymentStatus.PENDING;
+
+  /**
+   * Número da Nota fiscal.
+   */
+  @Column(name="fiscal_number", length = 50, unique = true)
+  private String fiscalNumber;
+
+  /**
+   * Número da Nota fiscal.
+   */
+  @Column(name="fiscal_notes")
+  private String fiscalNotes;
+
+  /**
+   * Usuário (ou vendedor) que realizou a venda.
+   */
+  @Column(name = "user_id")
+  private UUID userId;
+
+  /**
+   * Registra os itens (Produtos/Serviços) vendidos.
+   */
+  @OneToMany
+  private List<SaleItem> items;
+
+  /**
+   * Registra os métodos de pagamentos aplicados na venda.
+   */
+  @OneToMany
+  private List<SalePayment> payments;
+
+  /**
+   * Carimbo de data/hora de criação do registro. Definido automaticamente no PrePersist.
+   */
+  @Column(name="created_at", updatable = false)
+  private LocalDateTime createdAt;
+
+  /**
+   * Carimbo de data/hora da última atualização do registro. Definido automaticamente no PreUpdate.
+   */
+  @Column(name="update_at")
+  private LocalDateTime updatedAt;
+
+  /**
+   * Define a data de criação e atualização antes da persistência no banco de dados.
+   */
+  @PrePersist
+  protected void onCreate() {
+    this.createdAt = LocalDateTime.now();
+    this.updatedAt = LocalDateTime.now();
+  }
+
+  /**
+   * Atualiza o carimbo de data/hora de 'updatedAt' antes de qualquer atualização no banco de dados.
+   */
+  @PreUpdate
+  protected void onUpdate() {
+    this.updatedAt = LocalDateTime.now();
+  }
+}
