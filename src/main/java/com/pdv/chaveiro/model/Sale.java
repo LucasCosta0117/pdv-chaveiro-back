@@ -5,8 +5,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
@@ -53,7 +56,8 @@ public class Sale {
   /**
    * Registra o status da ordem de venda.
    */
-  @Column(name="payment_status", nullable = false)
+  @Enumerated(EnumType.STRING)
+  @Column(name="payment_status", nullable = false, length = 20)
   private PaymentStatus paymentStatus = PaymentStatus.PENDING;
 
   /**
@@ -77,13 +81,13 @@ public class Sale {
   /**
    * Registra os itens (Produtos/Serviços) vendidos.
    */
-  @OneToMany
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "sale")
   private List<SaleItem> items;
 
   /**
    * Registra os métodos de pagamentos aplicados na venda.
    */
-  @OneToMany
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "sale")
   private List<SalePayment> payments;
 
   /**
