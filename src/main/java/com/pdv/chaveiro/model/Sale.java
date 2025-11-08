@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -82,12 +84,14 @@ public class Sale {
    * Registra os itens (Produtos/Serviços) vendidos.
    */
   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "sale")
+  @JsonManagedReference //@todo remover após criar um SaleResponseDTO
   private List<SaleItem> items;
 
   /**
    * Registra os métodos de pagamentos aplicados na venda.
    */
   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "sale")
+  @JsonManagedReference //@todo remover após criar um SaleResponseDTO
   private List<SalePayment> payments;
 
   /**
