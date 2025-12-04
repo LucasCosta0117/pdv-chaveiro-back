@@ -10,12 +10,11 @@ import com.pdv.chaveiro.model.PaymentStatus;
 import com.pdv.chaveiro.model.Sale;
 import com.pdv.chaveiro.model.SaleItem;
 import com.pdv.chaveiro.model.SalePayment;
-import com.pdv.chaveiro.repository.SaleItemRepository;
-import com.pdv.chaveiro.repository.SalePaymentRepository;
 import com.pdv.chaveiro.repository.SaleRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Serviço responsável pela regra de negócio e gestão da entidade Sale (Vendas).
@@ -25,19 +24,16 @@ import lombok.RequiredArgsConstructor;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SaleService {
   /**
    * Repositório JPA para acesso e manipulação de dados da entidade Job.
    */
   private final SaleRepository saleRepo;
   /**
-   * Repositório JPA para acesso e manipulação de dados da entidade SaleItem.
-   */
-  private final SaleItemRepository itemRepo;
-  /**
    * Repositório JPA para acesso e manipulação de dados da entidade SalePayment.
    */
-  private final SalePaymentRepository paymentRepo;
+  private final ProductService productServ;
 
   /**
    * Retorna uma lista contendo todos os serviços (Jobs) cadastrados no sistema.
@@ -66,33 +62,39 @@ public class SaleService {
     sale.setFiscalNumber(null); // @todo valor null temporário, o sistema de notas será implementado futuramente
     sale.setUserId(null); // @todo valor null temporário, o sistema de usuários será implementado futuramente
 
-    Sale savedSale = saleRepo.save(sale);
-
     // Cria e associa os itens da venda
     List<SaleItem> items = dto.getItems().stream().map(i -> {
       SaleItem item = new SaleItem();
-      item.setSale(savedSale);
+
+      // Validações/Atualizações para quando o item vendido é um 'Produto'
+      if ("product".equals(i.getType())) {
+        productServ.updateProductStock(i.getId(), i.getQuantity());
+      }
+
       item.setItemId(i.getId());
       item.setItemType(i.getType());
       item.setQuantity(i.getQuantity());
       item.setUnitPrice(i.getUnit_price());
       item.setUnitDiscount(i.getUnit_discount());
-      return itemRepo.save(item);
+      item.setSale(sale);
+
+      return item;
     }).collect(Collectors.toList());
 
-    savedSale.setItems(items);
+    sale.setItems(items);
 
     // Cria e associa os pagamentos
     List<SalePayment> payments = dto.getPayment().stream().map(p -> {
       SalePayment pay = new SalePayment();
-      pay.setSale(savedSale);
       pay.setMethod(p.getMethod());
       pay.setAmount(p.getAmount());
-      return paymentRepo.save(pay);
+      pay.setSale(sale);
+
+      return pay;
     }).collect(Collectors.toList());
 
-    savedSale.setPayments(payments);
-
-    return savedSale;
+    sale.setPayments(payments);
+    
+    return saleRepo.save(sale);
   }
 }

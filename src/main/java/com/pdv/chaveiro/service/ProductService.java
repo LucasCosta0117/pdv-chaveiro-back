@@ -1,11 +1,14 @@
 package com.pdv.chaveiro.service;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
 import com.pdv.chaveiro.model.Product;
 import com.pdv.chaveiro.repository.ProductRepository;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Serviço responsável pela regra de negócio e gestão da entidade Product (Produtos).
@@ -14,6 +17,7 @@ import com.pdv.chaveiro.repository.ProductRepository;
  * @version 1.0.0
  */
 @Service
+@Slf4j
 public class ProductService {
 
   /**
@@ -37,5 +41,35 @@ public class ProductService {
    */
   public List<Product> getAll() {
     return productRepo.findAll();
+  }
+
+  /**
+   * Atualiza o valor do estoque de um produto com base na quantidade informada na requisição.
+   * <p>O valor a ser deduzido no estoque precisa ser inferior ou igual ao disponível</p>
+   * 
+   * @param productId         ID para identificação do produto.
+   * @param requestProductQty Quantidade a ser deduzida do estoque do produto.
+   * @return A entidade {@link Product} salva, com o valor de 'estoque' atualizado.
+   */
+  public Product updateProductStock(UUID productId, int requestProductQty) {
+    Product product = productRepo.findById(productId).orElseThrow(() -> {
+      log.error("Produto não encontrado com ID: {}", productId);
+      
+      return new RuntimeException("Produto não encontrado com ID: " + productId);
+    });
+
+    if (product.getStock() < requestProductQty) {
+      log.warn("Estoque insuficiente para '{}' - disponível: {} un, solicitado: {} un",
+        product.getName(), product.getStock(), requestProductQty);
+
+      throw new RuntimeException(
+        "Estoque insuficiente para '"+ product.getName() +"' - disponível: "+ product.getStock() +" un, solicitado: "+ requestProductQty +" un"
+      );
+    }
+
+    int newStock = product.getStock() - requestProductQty;
+    product.setStock(newStock);
+
+    return productRepo.save(product);
   }
 }
