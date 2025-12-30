@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.pdv.chaveiro.model.Product;
 import com.pdv.chaveiro.repository.ProductRepository;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -71,5 +72,18 @@ public class ProductService {
     product.setStock(newStock);
 
     return productRepo.save(product);
+  }
+
+  /**
+   * Retorna um objeto do tipo Product com base no ID fornecido.
+   * 
+   * @param productId   ID para identificação e busca do produto.
+   * @return Um objeto {@link Product}.
+   * @throws EntityNotFoundException caso o produto não seja encontrado.
+   */
+  public Product getById(UUID productId) {
+    return productRepo.findById(productId).orElseThrow(
+      ()-> new RuntimeException("Produto não encontrado com o ID: " + productId)
+    );
   }
 }

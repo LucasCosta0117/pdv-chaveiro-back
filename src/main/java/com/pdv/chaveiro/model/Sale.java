@@ -38,6 +38,12 @@ public class Sale {
   private UUID id;
 
   /**
+   * Identificador único da venda, usado para controle no front-end.
+   */
+  @Column(unique = true)
+  private String code;
+
+  /**
    * Total da venda sem considerar os descontos.
    */
   @Column
@@ -77,8 +83,8 @@ public class Sale {
   /**
    * Usuário (ou vendedor) que realizou a venda.
    */
-  @Column(name = "user_id")
-  private UUID userId;
+  @Column(name = "seller_name")
+  private String sellerName;
 
   /**
    * Registra os itens (Produtos/Serviços) vendidos.

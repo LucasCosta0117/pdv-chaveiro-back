@@ -13,5 +13,5 @@ public class ItemDTO {
   private String type;
   private Integer quantity;
   private BigDecimal unit_price;
-  private BigDecimal unit_discount;
+  private BigDecimal discount;
 }

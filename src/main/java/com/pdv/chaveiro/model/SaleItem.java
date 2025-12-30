@@ -43,17 +43,10 @@ public class SaleItem {
   private Sale sale;
 
   /**
-   * ID do item vendido, Produto ou Serviço (product_id / job_id).
+   * Nome do item no momento do registro da venda, Produto ou Serviço (product_name / job_name).
    */
-  @Column(name = "item_id", nullable = false)
-  private UUID itemId;
-
-  /**
-   * Identifica o tipo do item vendido, se Produto ou Serviço
-   * Facilita buscar pelo item dentro da sua respectiva tabela ('product' ou 'job').
-   */
-  @Column(name = "item_type", length = 10)
-  private String itemType;
+  @Column(name = "item_name")
+  private String itemName;
 
   /**
    * Quantidade do Produto/Serviço vendida.
@@ -70,8 +63,8 @@ public class SaleItem {
   /**
    * Desconto aplicado sobre o Produto/Serviço.
    */
-  @Column(name = "unit_discount", nullable = false)
-  private BigDecimal unitDiscount;
+  @Column(name = "discount", nullable = false)
+  private BigDecimal discount;
 
   /**
    * Carimbo de data/hora de criação do registro. Definido automaticamente no PrePersist.

@@ -15,6 +15,7 @@ public class SaleRequestDTO {
   private BigDecimal subtotal;
   private BigDecimal discounts;
   private BigDecimal total;
+  private String sellerName;
   private List<PaymentDTO> payment;
   private List<ItemDTO> items;
 }

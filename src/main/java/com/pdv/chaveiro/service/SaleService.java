@@ -1,12 +1,17 @@
 package com.pdv.chaveiro.service;
 
 import java.util.List;
+import java.util.Random;
+import java.util.UUID;
 import java.util.stream.Collectors;
+import java.time.Instant;
 
 import org.springframework.stereotype.Service;
 
 import com.pdv.chaveiro.dto.SaleRequestDTO;
+import com.pdv.chaveiro.model.Job;
 import com.pdv.chaveiro.model.PaymentStatus;
+import com.pdv.chaveiro.model.Product;
 import com.pdv.chaveiro.model.Sale;
 import com.pdv.chaveiro.model.SaleItem;
 import com.pdv.chaveiro.model.SalePayment;
@@ -34,6 +39,10 @@ public class SaleService {
    * Repositório JPA para acesso e manipulação de dados da entidade SalePayment.
    */
   private final ProductService productServ;
+  /**
+   * Repositório JPA para acesso e manipulação de dados da entidade SalePayment.
+   */
+  private final JobService jobServ;
 
   /**
    * Retorna uma lista contendo todos os serviços (Jobs) cadastrados no sistema.
@@ -60,7 +69,9 @@ public class SaleService {
     sale.setTotal(dto.getTotal());
     sale.setPaymentStatus(PaymentStatus.PAID);
     sale.setFiscalNumber(null); // @todo valor null temporário, o sistema de notas será implementado futuramente
-    sale.setUserId(null); // @todo valor null temporário, o sistema de usuários será implementado futuramente
+    sale.setSellerName(dto.getSellerName()); // @todo valor null temporário, o sistema de usuários será implementado futuramente
+
+    sale.setCode(this.createNewSaleCode());
 
     // Cria e associa os itens da venda
     List<SaleItem> items = dto.getItems().stream().map(i -> {
@@ -71,11 +82,10 @@ public class SaleService {
         productServ.updateProductStock(i.getId(), i.getQuantity());
       }
 
-      item.setItemId(i.getId());
-      item.setItemType(i.getType());
+      item.setItemName(this.findItemName(i.getId(), i.getType()));
       item.setQuantity(i.getQuantity());
       item.setUnitPrice(i.getUnit_price());
-      item.setUnitDiscount(i.getUnit_discount());
+      item.setDiscount(i.getDiscount());
       item.setSale(sale);
 
       return item;
@@ -96,5 +106,63 @@ public class SaleService {
     sale.setPayments(payments);
     
     return saleRepo.save(sale);
+  }
+
+  /**
+   * Gera um código identificador único para uma nova venda.
+   * <p>
+   * O código segue o padrão: {@code IZI-YYMMDD-TIMESTAMP-RANDOM}
+   * Onde:
+   * <ul>
+   * <li><b>IZI</b>: Prefixo fixo do sistema.</li>
+   * <li><b>TIMESTAMP</b>: Representação do momento atual em milissegundos (Unix Epoch).</li>
+   * <li><b>RANDOM</b>: Sufixo aleatório de 3 caracteres para evitar colisões em processos simultâneos.</li>
+   * </ul>
+   * </p>
+   * 
+   * @return Uma {@link String} representando o código único da venda. Exemplo: IZI1735582847123A9Z
+   */
+  private String createNewSaleCode() {
+    long millis = Instant.now().toEpochMilli();
+    String randomPart = generateRandomSuffix(3);
+    
+    return String.format("IZI%d%s", millis, randomPart);
+  }
+
+  /**
+   * Gera uma string aleatória alfanumérica.
+   * 
+   * @param length Comprimento da string desejada.
+   * @return String aleatória contendo letras maiúsculas e números.
+   */
+  private String generateRandomSuffix(int length) {
+    String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    StringBuilder suffix = new StringBuilder();
+    Random random = new Random();
+    
+    for (int i = 0; i < length; i++) {
+      suffix.append(chars.charAt(random.nextInt(chars.length())));
+    }
+    
+    return suffix.toString();
+  }
+
+  /**
+   * Busca o nome descritivo de um item (Produto ou Serviço) com base no seu ID e tipo.
+   * 
+   * @param itemId   O {@link UUID} identificador único do item no banco de dados.
+   * @param itemType Uma {@link String} indicando a categoria do item (ex: "product" para produtos, 
+   * qualquer outro valor será tratado como serviço/job).
+   * @return O nome do item encontrado (propriedade {@code name} da entidade).
+   * @throws RuntimeException Caso o item não seja encontrado em seus respectivos repositórios.
+   */
+  private String findItemName(UUID itemId, String itemType) {
+    if ("product".equals(itemType)) {
+        Product product = productServ.getById(itemId);
+        return product.getName();
+    } 
+    
+    Job job = jobServ.getById(itemId);
+    return job.getName();
   }
 }
