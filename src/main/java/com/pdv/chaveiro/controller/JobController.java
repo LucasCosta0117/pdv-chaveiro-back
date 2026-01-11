@@ -1,14 +1,18 @@
 package com.pdv.chaveiro.controller;
 
 import java.util.List;
+import java.util.UUID;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pdv.chaveiro.model.Job;
 import com.pdv.chaveiro.service.JobService;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 /**
  * Controlador REST responsável por expor os endpoints da API para a gestão e consulta da entidade Job (Serviços).
@@ -45,5 +49,19 @@ public class JobController {
   @GetMapping("/all")
   public List<Job> findAll() {
     return jobServ.getAll();
+  }
+
+  /**
+   * Endpoint DELETE para excluir um serviço do sistema.
+   * <p>Mapeado para: /api/job/delete/{id}</p>
+   * 
+   * @param id ID do item à ser excluido.
+   * @return Retorna apenas status de sucesso 204 No Content.
+   */
+  @DeleteMapping("/delete/{id}")
+  public ResponseEntity<Void> delete(@PathVariable UUID id) {
+    jobServ.softDelete(id);
+    
+    return ResponseEntity.noContent().build();
   }
 }

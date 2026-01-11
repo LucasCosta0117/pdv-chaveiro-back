@@ -101,6 +101,12 @@ public class Sale {
   private List<SalePayment> payments;
 
   /**
+   * Flag de exclusão lógica (soft delete).
+   */
+  @Column(name = "is_deleted", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+  private Boolean isDeleted = false;
+
+  /**
    * Carimbo de data/hora de criação do registro. Definido automaticamente no PrePersist.
    */
   @Column(name="created_at", updatable = false)

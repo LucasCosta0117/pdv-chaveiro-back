@@ -10,6 +10,7 @@ import com.pdv.chaveiro.model.Product;
 import com.pdv.chaveiro.repository.JobRepository;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 
 /**
  * Serviço responsável pela regra de negócio e gestão da entidade Job (Serviços).
@@ -54,5 +55,21 @@ public class JobService {
     return jobRepo.findById(jobId).orElseThrow(
       () -> new RuntimeException("Serviço não encontrado com o ID: " + jobId)
     );
+  }
+
+  /**
+   * Realiza um soft delete do objeto no banco, de modo que é feito apenas um UPDATE na flag 'deleted' da entidade.
+   * <p>O método é transacional: se qualquer operação falhar, toda a transação é revertida.</p>
+   * 
+   * @param id ID do item à ser excluido.
+   */
+  @Transactional
+  public void softDelete(UUID id) {
+    Job job = jobRepo.findById(id)
+      .orElseThrow(() -> new EntityNotFoundException("Serviço não encontrado"));
+
+    job.setIsDeleted(true);
+
+    jobRepo.save(job);
   }
 }

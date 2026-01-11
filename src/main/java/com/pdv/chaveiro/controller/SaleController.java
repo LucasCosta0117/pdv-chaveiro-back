@@ -1,10 +1,13 @@
 package com.pdv.chaveiro.controller;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -56,5 +59,19 @@ public class SaleController {
     Sale saleSaved = saleServ.saveSale(newSale);
 
     return ResponseEntity.ok(saleSaved);
+  }
+
+  /**
+   * Endpoint DELETE para excluir uma venda do sistema.
+   * <p>Mapeado para: /api/sale/delete/{id}</p>
+   * 
+   * @param id ID do item à ser excluido.
+   * @return Retorna apenas status de sucesso 204 No Content.
+   */
+  @DeleteMapping("/delete/{id}")
+  public ResponseEntity<Void> delete(@PathVariable UUID id) {
+    saleServ.softDelete(id);
+    
+    return ResponseEntity.noContent().build();
   }
 }

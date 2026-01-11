@@ -6,9 +6,11 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 import com.pdv.chaveiro.model.Product;
+import com.pdv.chaveiro.model.Sale;
 import com.pdv.chaveiro.repository.ProductRepository;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -85,5 +87,21 @@ public class ProductService {
     return productRepo.findById(productId).orElseThrow(
       ()-> new RuntimeException("Produto não encontrado com o ID: " + productId)
     );
+  }
+
+  /**
+   * Realiza um soft delete do objeto no banco, de modo que é feito apenas um UPDATE na flag 'deleted' da entidade.
+   * <p>O método é transacional: se qualquer operação falhar, toda a transação é revertida.</p>
+   * 
+   * @param id ID do item à ser excluido.
+   */
+  @Transactional
+  public void softDelete(UUID id) {
+    Product product = productRepo.findById(id)
+      .orElseThrow(() -> new EntityNotFoundException("Produto não encontrado"));
+
+    product.setIsDeleted(true);
+
+    productRepo.save(product);
   }
 }

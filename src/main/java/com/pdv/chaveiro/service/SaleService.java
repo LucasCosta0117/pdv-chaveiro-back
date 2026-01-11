@@ -1,10 +1,10 @@
 package com.pdv.chaveiro.service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import java.time.Instant;
 
 import org.springframework.stereotype.Service;
 
@@ -17,6 +17,7 @@ import com.pdv.chaveiro.model.SaleItem;
 import com.pdv.chaveiro.model.SalePayment;
 import com.pdv.chaveiro.repository.SaleRepository;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -106,6 +107,22 @@ public class SaleService {
     sale.setPayments(payments);
     
     return saleRepo.save(sale);
+  }
+
+  /**
+   * Realiza um soft delete do objeto no banco, de modo que é feito apenas um UPDATE na flag 'deleted' da entidade.
+   * <p>O método é transacional: se qualquer operação falhar, toda a transação é revertida.</p>
+   * 
+   * @param id ID do item à ser excluido.
+   */
+  @Transactional
+  public void softDelete(UUID id) {
+    Sale sale = saleRepo.findById(id)
+      .orElseThrow(() -> new EntityNotFoundException("Venda não encontrada"));
+
+    sale.setIsDeleted(true);
+
+    saleRepo.save(sale);
   }
 
   /**
