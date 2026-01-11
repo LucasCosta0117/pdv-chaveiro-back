@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import org.hibernate.annotations.SQLRestriction;
+
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
@@ -29,6 +31,7 @@ import lombok.Data;
  */
 @Entity
 @Data
+@SQLRestriction("is_deleted = false")
 public class Sale {
   /**
    * Identificador único (Primary Key) da entidade. Gerado automaticamente pelo banco de dados.
