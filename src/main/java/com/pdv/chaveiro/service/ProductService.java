@@ -6,7 +6,6 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 import com.pdv.chaveiro.model.Product;
-import com.pdv.chaveiro.model.Sale;
 import com.pdv.chaveiro.repository.ProductRepository;
 
 import jakarta.persistence.EntityNotFoundException;
