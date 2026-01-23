@@ -9,11 +9,14 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.pdv.chaveiro.dto.ProductRequestDTO;
 import com.pdv.chaveiro.model.Product;
 import com.pdv.chaveiro.service.ProductService;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 /**
  * Controlador REST responsável por expor os endpoints da API para a gestão e consulta da entidade Product (Produtos).
@@ -64,5 +67,19 @@ public class ProductController {
     productServ.softDelete(id);
     
     return ResponseEntity.noContent().build();
+  }
+
+  /**
+   * Endpoint POST para salvar um novo produto.
+   * <p>Mapeado para: /api/product/save</p>
+   * 
+   * @param newProduct Objeto JSON contendo os dados do novo produto.
+   * @return O produto registrado no banco.
+   */
+  @PostMapping("/save")
+  public ResponseEntity<Product> save(@RequestBody ProductRequestDTO newProduct) {
+    Product productSaved = productServ.saveProduct(newProduct);
+
+    return ResponseEntity.ok(productSaved);
   }
 }

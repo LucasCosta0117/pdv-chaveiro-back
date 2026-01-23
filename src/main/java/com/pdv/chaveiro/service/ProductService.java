@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
+import com.pdv.chaveiro.dto.ProductRequestDTO;
 import com.pdv.chaveiro.model.Product;
 import com.pdv.chaveiro.repository.ProductRepository;
 
@@ -102,5 +103,31 @@ public class ProductService {
     product.setIsDeleted(true);
 
     productRepo.save(product);
+  }
+
+  /**
+   * Persiste um novo produto no banco de dados.
+   * <p>O método é transacional: se qualquer operação falhar, toda a transação é revertida.</p>
+   * 
+   * @param dto Objeto contendo os dados do novo produto vindo do front-end.
+   * @return A entidade {@link Product} salvo.
+   */
+  @Transactional
+  public Product saveProduct(ProductRequestDTO dto) {
+    Product product = new Product();
+
+    product.setName(dto.getName());
+    product.setBrand(dto.getBrand());
+    product.setCode(dto.getCode());
+    product.setDepartment(dto.getDepartment());
+    product.setCategory(dto.getCategory());
+    product.setSubcategory(dto.getSubcategory());
+    product.setPrice(dto.getPrice());
+    product.setStock(dto.getStock());
+    product.setImgUrl(dto.getImgUrl());
+    product.setCanSale(dto.getCanSale());
+    product.setIsActive(dto.getIsActive());
+
+    return productRepo.save(product);
   }
 }
