@@ -9,10 +9,13 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.pdv.chaveiro.dto.JobRequestDTO;
 import com.pdv.chaveiro.model.Job;
 import com.pdv.chaveiro.service.JobService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 /**
  * Controlador REST responsável por expor os endpoints da API para a gestão e consulta da entidade Job (Serviços).
@@ -63,5 +66,19 @@ public class JobController {
     jobServ.softDelete(id);
     
     return ResponseEntity.noContent().build();
+  }
+
+  /**
+   * Endpoint POST para salvar um novo serviço.
+   * <p>Mapeado para: /api/job/save</p>
+   * 
+   * @param newJob Objeto JSON contendo os dados do novo serviço.
+   * @return O serviço registrado no banco.
+   */
+  @PostMapping("/save")
+  public ResponseEntity<Job> save(@RequestBody JobRequestDTO newJob) {
+    Job jobSaved = jobServ.saveJob(newJob);
+    
+    return ResponseEntity.ok(jobSaved);
   }
 }

@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
+import com.pdv.chaveiro.dto.JobRequestDTO;
 import com.pdv.chaveiro.model.Job;
 import com.pdv.chaveiro.model.Product;
 import com.pdv.chaveiro.repository.JobRepository;
@@ -71,5 +72,25 @@ public class JobService {
     job.setIsDeleted(true);
 
     jobRepo.save(job);
+  }
+
+  /**
+   * Persiste um novo serviço no banco de dados.
+   * <p>O método é transacional: se qualquer operação falhar, toda a transação é revertida.</p>
+   * 
+   * @param dto - Objeto contendo os dados do novo serviço à ser salvo vindo do Fron-end.
+   * @return A entidade {@link Job} salva.
+   */
+  @Transactional
+  public Job saveJob(JobRequestDTO dto) {
+    Job job = new Job();
+    job.setName(dto.getName());
+    job.setCode(dto.getCode());
+    job.setCategory(dto.getCategory());
+    job.setSubcategory(dto.getSubcategory());
+    job.setPrice(dto.getPrice());
+    job.setIsActive(dto.getIsActive());
+
+    return jobRepo.save(job);
   }
 }
