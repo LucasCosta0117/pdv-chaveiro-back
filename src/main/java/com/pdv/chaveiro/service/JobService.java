@@ -93,4 +93,26 @@ public class JobService {
 
     return jobRepo.save(job);
   }
+
+  /**
+   * Atualizar os dados de um serviço existente.
+   * 
+   * @param id Identificador do serviço.
+   * @param dto Dados atualizados.
+   * @return A entidade {@link Job} atualizada.
+   */
+  @Transactional
+  public Job updateJob(UUID id, JobRequestDTO dto) {
+    Job job = jobRepo.findById(id)
+      .orElseThrow(() -> new RuntimeException("Serviço não encontrado para o ID: " + id));
+
+    job.setName(dto.getName());
+    job.setCode(dto.getCode());
+    job.setCategory(dto.getCategory());
+    job.setSubcategory(dto.getSubcategory());
+    job.setPrice(dto.getPrice());
+    job.setIsActive(dto.getIsActive());
+
+    return jobRepo.save(job);
+  }
 }

@@ -16,6 +16,7 @@ import com.pdv.chaveiro.service.ProductService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 /**
@@ -81,5 +82,20 @@ public class ProductController {
     Product productSaved = productServ.saveProduct(newProduct);
 
     return ResponseEntity.ok(productSaved);
+  }
+
+  /**
+   * Endpoint PUT para atualizar um produto existente.
+   * <p>Mapeado para: /api/product/update/{id}</p>
+   * 
+   * @param id Identificador único do produto a ser editado.
+   * @param editedProduct Objeto JSON contendo os novos dados do produto.
+   * @return O produto atualizado no banco.
+   */
+  @PutMapping("/update/{id}")
+  public ResponseEntity<Product> update(@PathVariable UUID id, @RequestBody ProductRequestDTO editedProduct) {
+    Product productUpdated = productServ.updateProduct(id, editedProduct);
+    
+    return ResponseEntity.ok(productUpdated);
   }
 }

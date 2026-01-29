@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -73,5 +74,20 @@ public class SaleController {
     saleServ.softDelete(id);
     
     return ResponseEntity.noContent().build();
+  }
+
+  /**
+   * Endpoint PUT para atualizar uma venda existente.
+   * <p>Mapeado para: /api/sale/update/{id}</p>
+   * 
+   * @param id Identificador único da venda a ser editada.
+   * @param editedSale Objeto JSON contendo os novos dados da venda.
+   * @return A venda atualizada no banco.
+   */
+  @PutMapping("/update/{id}")
+  public ResponseEntity<Sale> update(@PathVariable UUID id, @RequestBody SaleRequestDTO editedSale) {
+    Sale saleUpdated = saleServ.updateSale(id, editedSale);
+    
+    return ResponseEntity.ok(saleUpdated);
   }
 }

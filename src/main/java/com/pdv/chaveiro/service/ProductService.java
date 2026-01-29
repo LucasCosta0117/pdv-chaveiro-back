@@ -130,4 +130,31 @@ public class ProductService {
 
     return productRepo.save(product);
   }
+
+  /**
+   * Atualizar os dados de um produto existente.
+   * 
+   * @param id Identificador do produto.
+   * @param dto Dados atualizados.
+   * @return A entidade {@link Product} atualizada.
+   */
+  @Transactional
+  public Product updateProduct(UUID id, ProductRequestDTO dto) {
+    Product product = productRepo.findById(id)
+      .orElseThrow(() -> new RuntimeException("Produto não encontrado com o ID: " + id));
+
+    product.setName(dto.getName());
+    product.setBrand(dto.getBrand());
+    product.setCode(dto.getCode());
+    product.setDepartment(dto.getDepartment());
+    product.setCategory(dto.getCategory());
+    product.setSubcategory(dto.getSubcategory());
+    product.setPrice(dto.getPrice());
+    product.setStock(dto.getStock());
+    product.setImgUrl(dto.getImgUrl());
+    product.setCanSale(dto.getCanSale());
+    product.setIsActive(dto.getIsActive());
+
+    return productRepo.save(product);
+  }
 }

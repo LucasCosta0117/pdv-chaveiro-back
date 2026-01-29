@@ -126,6 +126,22 @@ public class SaleService {
   }
 
   /**
+   * Lógica de negócio para atualizar uma venda existente.
+   * * @param id Identificador da venda.
+   * @param dto Dados atualizados.
+   * @return A venda atualizada.
+   */
+  @Transactional
+  public Sale updateSale(UUID id, SaleRequestDTO dto) {
+    Sale sale = saleRepo.findById(id)
+      .orElseThrow(() -> new RuntimeException("Venda não encontrada com o ID: " + id));
+
+    // @TODO - Passar corretamente os valores do dto para a entidade encontrada.
+
+    return saleRepo.save(sale);
+  }
+
+  /**
    * Gera um código identificador único para uma nova venda.
    * <p>
    * O código segue o padrão: {@code IZI-YYMMDD-TIMESTAMP-RANDOM}

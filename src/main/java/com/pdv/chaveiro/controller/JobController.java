@@ -15,6 +15,7 @@ import com.pdv.chaveiro.service.JobService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 /**
@@ -80,5 +81,20 @@ public class JobController {
     Job jobSaved = jobServ.saveJob(newJob);
     
     return ResponseEntity.ok(jobSaved);
+  }
+
+  /**
+   * Endpoint PUT para atualizar um serviço existente.
+   * <p>Mapeado para: /api/job/update/{id}</p>
+   * 
+   * @param id Identificador único do serviço a ser editado.
+   * @param editedJob Objeto JSON contendo os novos dados do serviço.
+   * @return O serviço atualizado no banco.
+   */
+  @PutMapping("/update/{id}")
+  public ResponseEntity<Job> update(@PathVariable UUID id, @RequestBody JobRequestDTO editedJob) {
+    Job jobUpdated = jobServ.updateJob(id, editedJob);
+    
+    return ResponseEntity.ok(jobUpdated);
   }
 }
