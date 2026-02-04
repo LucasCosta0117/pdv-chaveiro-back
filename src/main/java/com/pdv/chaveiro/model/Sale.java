@@ -68,8 +68,8 @@ public class Sale {
    * Registra o status da ordem de venda.
    */
   @Enumerated(EnumType.STRING)
-  @Column(name="payment_status", nullable = false, length = 20)
-  private PaymentStatus paymentStatus = PaymentStatus.PENDING;
+  @Column(name="status", nullable = false, length = 20)
+  private SaleStatus status = SaleStatus.COMPLETED;
 
   /**
    * Número da Nota fiscal.

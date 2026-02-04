@@ -1,8 +1,7 @@
 package com.pdv.chaveiro.model;
 
-public enum PaymentStatus {
-  PAID,
-  PENDING,
+public enum SaleStatus {
+  COMPLETED,
   CANCELED,
   REFUNDED
 }

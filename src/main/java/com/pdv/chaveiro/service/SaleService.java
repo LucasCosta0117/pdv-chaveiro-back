@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.pdv.chaveiro.dto.SaleRequestDTO;
 import com.pdv.chaveiro.model.Job;
-import com.pdv.chaveiro.model.PaymentStatus;
+import com.pdv.chaveiro.model.SaleStatus;
 import com.pdv.chaveiro.model.Product;
 import com.pdv.chaveiro.model.Sale;
 import com.pdv.chaveiro.model.SaleItem;
@@ -68,7 +68,7 @@ public class SaleService {
     sale.setSubtotal(dto.getSubtotal());
     sale.setTotalDiscount(dto.getDiscounts());
     sale.setTotal(dto.getTotal());
-    sale.setPaymentStatus(PaymentStatus.PAID);
+    sale.setStatus(SaleStatus.COMPLETED);
     sale.setFiscalNumber(null); // @todo valor null temporário, o sistema de notas será implementado futuramente
     sale.setSellerName(dto.getSellerName()); // @todo valor null temporário, o sistema de usuários será implementado futuramente
 
