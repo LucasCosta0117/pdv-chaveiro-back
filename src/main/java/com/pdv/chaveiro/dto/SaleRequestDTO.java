@@ -2,6 +2,9 @@ package com.pdv.chaveiro.dto;
 
 import java.math.BigDecimal;
 import java.util.List;
+
+import com.pdv.chaveiro.model.SaleStatus;
+
 import lombok.Data;
 
 /**
@@ -16,6 +19,7 @@ public class SaleRequestDTO {
   private BigDecimal discounts;
   private BigDecimal total;
   private String sellerName;
+  private SaleStatus status;
   private List<PaymentDTO> payment;
   private List<ItemDTO> items;
 }

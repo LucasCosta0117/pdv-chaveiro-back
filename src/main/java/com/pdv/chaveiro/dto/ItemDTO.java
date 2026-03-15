@@ -10,7 +10,7 @@ import lombok.Data;
 @Data
 public class ItemDTO {
   private UUID id;
-  private String type;
+  private String entity;
   private Integer quantity;
   private BigDecimal unit_price;
   private BigDecimal discount;

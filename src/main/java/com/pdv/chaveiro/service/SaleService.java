@@ -68,7 +68,7 @@ public class SaleService {
     sale.setSubtotal(dto.getSubtotal());
     sale.setTotalDiscount(dto.getDiscounts());
     sale.setTotal(dto.getTotal());
-    sale.setStatus(SaleStatus.COMPLETED);
+    sale.setStatus(dto.getStatus());
     sale.setFiscalNumber(null); // @todo valor null temporário, o sistema de notas será implementado futuramente
     sale.setSellerName(dto.getSellerName()); // @todo valor null temporário, o sistema de usuários será implementado futuramente
 
@@ -79,11 +79,11 @@ public class SaleService {
       SaleItem item = new SaleItem();
 
       // Validações/Atualizações para quando o item vendido é um 'Produto'
-      if ("product".equals(i.getType())) {
+      if ("products".equals(i.getEntity())) {
         productServ.updateProductStock(i.getId(), i.getQuantity());
       }
 
-      item.setItemName(this.findItemName(i.getId(), i.getType()));
+      item.setItemName(this.findItemName(i.getId(), i.getEntity()));
       item.setQuantity(i.getQuantity());
       item.setUnitPrice(i.getUnit_price());
       item.setDiscount(i.getDiscount());
@@ -190,7 +190,7 @@ public class SaleService {
    * @throws RuntimeException Caso o item não seja encontrado em seus respectivos repositórios.
    */
   private String findItemName(UUID itemId, String itemType) {
-    if ("product".equals(itemType)) {
+    if ("products".equals(itemType)) {
         Product product = productServ.getById(itemId);
         return product.getName();
     } 
