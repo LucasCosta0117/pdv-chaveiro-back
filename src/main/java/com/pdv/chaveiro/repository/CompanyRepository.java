@@ -18,5 +18,12 @@ import java.util.UUID;
  */
 @Repository
 public interface CompanyRepository extends JpaRepository<com.pdv.chaveiro.model.entities.Company, UUID> {
-  // Utilizando métodos nativos JpaRepository. Nenhum método adicional/customizado por enquanto
+  /**
+   * Método para procurar uma empresa pelo CNPJ.
+   * 
+   * @param cnpj CNPJ da entidade empresa.
+   * 
+   * @return A entidade {@link Company}.
+   */
+  Optional<Company> findByCnpj(String cnpj);
 }
