@@ -19,7 +19,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Representa uma Venda (sale) seja de produto ou serviço realizado pelo estabelicimento.
@@ -32,6 +34,8 @@ import lombok.Data;
 @Entity
 @Data
 @SQLRestriction("is_deleted = false")
+@NoArgsConstructor
+@AllArgsConstructor
 public class Sale {
   /**
    * Identificador único (Primary Key) da entidade. Gerado automaticamente pelo banco de dados.

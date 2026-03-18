@@ -15,7 +15,9 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Entidade para registro dos métodos de pagamentos e seus respectivos valores associados a uma venda.
@@ -26,6 +28,8 @@ import lombok.Data;
 @Entity
 @Data
 @Table(name = "sale_payments")
+@NoArgsConstructor
+@AllArgsConstructor
 public class SalePayment {
   /**
    * Identificador único (Primary Key) da entidade. Gerado automaticamente pelo banco de dados.

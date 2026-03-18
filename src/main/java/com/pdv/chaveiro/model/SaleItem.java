@@ -15,7 +15,9 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Entidade para registro dos itens associados a uma venda (Produtos/Serviços).
@@ -26,6 +28,8 @@ import lombok.Data;
 @Entity
 @Data
 @Table(name = "sale_items")
+@NoArgsConstructor
+@AllArgsConstructor
 public class SaleItem {
   /**
    * Identificador único (Primary Key) da entidade. Gerado automaticamente pelo banco de dados.

@@ -13,7 +13,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.validation.constraints.Min;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Representa um Serviço (Job) oferecido pelo estabelicimento comercial.
@@ -26,6 +28,8 @@ import lombok.Data;
 @Entity
 @Data
 @SQLRestriction("is_deleted = false")
+@NoArgsConstructor
+@AllArgsConstructor
 public class Job {
 
   /**
