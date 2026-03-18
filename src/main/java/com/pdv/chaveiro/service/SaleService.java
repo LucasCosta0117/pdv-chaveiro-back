@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import com.pdv.chaveiro.dto.SaleRequestDTO;
 import com.pdv.chaveiro.model.Job;
-import com.pdv.chaveiro.model.SaleStatus;
 import com.pdv.chaveiro.model.Product;
 import com.pdv.chaveiro.model.Sale;
 import com.pdv.chaveiro.model.SaleItem;
