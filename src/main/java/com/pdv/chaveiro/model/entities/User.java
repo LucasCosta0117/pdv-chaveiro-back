@@ -1,4 +1,4 @@
-package com.pdv.chaveiro.model;
+package com.pdv.chaveiro.model.entities;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.UUID;
+
+import com.pdv.chaveiro.model.enums.UserRole;
 
 /**
  * Representa um funcionário/dono (user) ligado a uma companhia cadastrada no sistema.

@@ -1,4 +1,4 @@
-package com.pdv.chaveiro.model;
+package com.pdv.chaveiro.model.entities;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

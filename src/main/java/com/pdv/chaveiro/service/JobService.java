@@ -6,8 +6,8 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 import com.pdv.chaveiro.dto.JobRequestDTO;
-import com.pdv.chaveiro.model.Job;
-import com.pdv.chaveiro.model.Product;
+import com.pdv.chaveiro.model.entities.Job;
+import com.pdv.chaveiro.model.entities.Product;
 import com.pdv.chaveiro.repository.JobRepository;
 
 import jakarta.persistence.EntityNotFoundException;

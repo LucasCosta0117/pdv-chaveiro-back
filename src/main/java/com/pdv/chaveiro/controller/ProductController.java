@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pdv.chaveiro.dto.ProductRequestDTO;
-import com.pdv.chaveiro.model.Product;
+import com.pdv.chaveiro.model.entities.Product;
 import com.pdv.chaveiro.service.ProductService;
 
 import org.springframework.web.bind.annotation.GetMapping;

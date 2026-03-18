@@ -1,4 +1,4 @@
-package com.pdv.chaveiro.model;
+package com.pdv.chaveiro.model.enums;
 
 public enum SaleStatus {
   COMPLETED,

@@ -1,4 +1,4 @@
-package com.pdv.chaveiro.model;
+package com.pdv.chaveiro.model.enums;
 
 public enum UserRole {
     ADMIN,    // Acesso total: acesso a todas as telas, configurações do sistema, exclusão de dados.

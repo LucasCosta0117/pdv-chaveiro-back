@@ -1,4 +1,4 @@
-package com.pdv.chaveiro.model;
+package com.pdv.chaveiro.model.entities;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -20,17 +20,17 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Entidade para registro dos métodos de pagamentos e seus respectivos valores associados a uma venda.
+ * Entidade para registro dos itens associados a uma venda (Produtos/Serviços).
  * 
  * @author Lucas Costa
  * @version 1.0.0
  */
 @Entity
 @Data
-@Table(name = "sale_payments")
+@Table(name = "sale_items")
 @NoArgsConstructor
 @AllArgsConstructor
-public class SalePayment {
+public class SaleItem {
   /**
    * Identificador único (Primary Key) da entidade. Gerado automaticamente pelo banco de dados.
    */
@@ -47,16 +47,28 @@ public class SalePayment {
   private Sale sale;
 
   /**
-   * Registra o nome do método de pagamento.
+   * Nome do item no momento do registro da venda, Produto ou Serviço (product_name / job_name).
    */
-  @Column(nullable = false, length = 20)
-  private String method; // ex: 'PIX', 'CASH', 'CREDIT', 'DEBIT'
+  @Column(name = "item_name")
+  private String itemName;
 
   /**
-   * Registra o valor pago através deste método de pagamento.
+   * Quantidade do Produto/Serviço vendida.
    */
   @Column(nullable = false)
-  private BigDecimal amount;
+  private Integer quantity = 1;
+
+  /**
+   * Valor unitário no momento da venda para o Produto/Serviço.
+   */
+  @Column(name = "unit_price", nullable = false)
+  private BigDecimal unitPrice;
+
+  /**
+   * Desconto aplicado sobre o Produto/Serviço.
+   */
+  @Column(name = "discount", nullable = false)
+  private BigDecimal discount;
 
   /**
    * Carimbo de data/hora de criação do registro. Definido automaticamente no PrePersist.

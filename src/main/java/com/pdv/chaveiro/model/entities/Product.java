@@ -1,4 +1,4 @@
-package com.pdv.chaveiro.model;
+package com.pdv.chaveiro.model.entities;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -18,8 +18,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Representa um Serviço (Job) oferecido pelo estabelicimento comercial.
- * <p>Esta entidade mapeia a tabela de serviços, contendo atributos como preço e categoria,
+ * Representa um Produto (product) vendido pelo estabelicimento comercial.
+ * <p>Esta entidade mapeia a tabela de produtos, contendo atributos como preço e categoria,
  * e é uma das bases para o registro de transações no PDV.</p>
  * 
  * @author Lucas Costa
@@ -30,7 +30,7 @@ import lombok.NoArgsConstructor;
 @SQLRestriction("is_deleted = false")
 @NoArgsConstructor
 @AllArgsConstructor
-public class Job {
+public class Product {
 
   /**
    * Identificador único (Primary Key) da entidade. Gerado automaticamente pelo banco de dados.
@@ -40,32 +40,43 @@ public class Job {
   private UUID id;
 
   /**
-   * Nome descritivo do serviço
-   * <p>Restrição: Não pode ser nulo e tem um limite de 100 caracteres.</p>
+   * Nome descritivo do produto
    */
   @Column(length = 100, nullable = false)
   private String name;
 
   /**
-   * Código interno de referência.
+   * Marca do produto para identificação.
    */
-  @Column(length = 50)
+  @Column(length = 100)
+  private String brand;
+
+  /**
+   * Código interno de referência ou SKU do produto.
+   */
+  @Column(length = 100)
   private String code;
 
   /**
-   * Categoria principal do serviço.
+   * Departamento para divisão macro do produto.
    */
-  @Column(length = 50)
+  @Column(length = 100)
+  private String department;
+
+  /**
+   * Categoria principal do produto.
+   */
+  @Column(length = 100)
   private String category;
 
   /**
-   * Subcategoria do serviço para granularidade.
+   * Subcategoria do produto para granularidade.
    */
-  @Column(length = 50)
+  @Column(length = 100)
   private String subcategory;
 
   /**
-   * Preço padrão do serviço.
+   * Preço padrão do produto.
    * <p>Restrição: Não pode ser negativo (validação @Min(0)).</p>
    */
   @Column
@@ -73,7 +84,26 @@ public class Job {
   private BigDecimal price;
 
   /**
-   * Indica se o serviço está ativo no PDV.
+   * Quantidade do produto disponível para venda.
+   */
+  @Column
+  @Min(value = 0, message = "Stock quantity cannot be negative")
+  private Integer stock;
+
+  /**
+   * URL do banco de arquivos da imagem do produto.
+   */
+  @Column(name = "img_url", columnDefinition = "TEXT")
+  private String imgUrl;
+
+  /**
+   * Indica se o produto está disponível para venda no PDV.
+   */
+  @Column(name = "can_sale")
+  private Boolean canSale;
+
+  /**
+   * Indica se o produto está ativo no PDV.
    */
   @Column(name = "is_active", nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
   private Boolean isActive = true;

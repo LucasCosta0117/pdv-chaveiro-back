@@ -3,7 +3,7 @@ package com.pdv.chaveiro.dto;
 import java.math.BigDecimal;
 import java.util.List;
 
-import com.pdv.chaveiro.model.SaleStatus;
+import com.pdv.chaveiro.model.enums.SaleStatus;
 
 import lombok.Data;
 

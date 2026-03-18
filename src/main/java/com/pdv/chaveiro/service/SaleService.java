@@ -9,11 +9,11 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.pdv.chaveiro.dto.SaleRequestDTO;
-import com.pdv.chaveiro.model.Job;
-import com.pdv.chaveiro.model.Product;
-import com.pdv.chaveiro.model.Sale;
-import com.pdv.chaveiro.model.SaleItem;
-import com.pdv.chaveiro.model.SalePayment;
+import com.pdv.chaveiro.model.entities.Job;
+import com.pdv.chaveiro.model.entities.Product;
+import com.pdv.chaveiro.model.entities.Sale;
+import com.pdv.chaveiro.model.entities.SaleItem;
+import com.pdv.chaveiro.model.entities.SalePayment;
 import com.pdv.chaveiro.repository.SaleRepository;
 
 import jakarta.persistence.EntityNotFoundException;

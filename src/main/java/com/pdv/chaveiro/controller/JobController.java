@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pdv.chaveiro.dto.JobRequestDTO;
-import com.pdv.chaveiro.model.Job;
+import com.pdv.chaveiro.model.entities.Job;
 import com.pdv.chaveiro.service.JobService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

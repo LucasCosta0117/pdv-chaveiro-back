@@ -1,4 +1,4 @@
-package com.pdv.chaveiro.model;
+package com.pdv.chaveiro.model.entities;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -8,6 +8,7 @@ import java.util.UUID;
 import org.hibernate.annotations.SQLRestriction;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.pdv.chaveiro.model.enums.SaleStatus;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

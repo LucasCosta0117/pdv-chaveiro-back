@@ -5,7 +5,7 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.pdv.chaveiro.model.Product;
+import com.pdv.chaveiro.model.entities.Product;
 
 /**
  * Repositório de dados para a entidade {@link Product}.

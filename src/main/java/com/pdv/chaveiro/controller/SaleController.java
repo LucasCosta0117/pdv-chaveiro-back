@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pdv.chaveiro.dto.SaleRequestDTO;
-import com.pdv.chaveiro.model.Sale;
+import com.pdv.chaveiro.model.entities.Sale;
 import com.pdv.chaveiro.service.SaleService;
 
 import lombok.RequiredArgsConstructor;
