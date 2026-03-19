@@ -5,7 +5,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import com.pdv.chaveiro.model.enums.UserRole;
 
@@ -20,7 +26,7 @@ import com.pdv.chaveiro.model.enums.UserRole;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class User implements UserDetails {
 
   /**
    * Identificador único (Primary Key) da entidade. Gerado automaticamente pelo banco de dados.
@@ -94,5 +100,58 @@ public class User {
   @PreUpdate
   protected void onUpdate() {
     this.updatedAt = LocalDateTime.now();
+  }
+
+  /**
+   * Retorna as permissões (roles) que o usuário tem.
+   */
+  @Override
+  public Collection<? extends GrantedAuthority> getAuthorities() {
+      // O Spring Security usa o prefixo "ROLE_" por padrão para entender que é um papel.
+      return List.of(new SimpleGrantedAuthority("ROLE_" + this.role.name()));
+  }
+
+  /**
+   * Define o email como o "username" padrão do o Spring Security
+   */
+  @Override
+  public String getUsername() {
+      return this.email;
+  }
+
+  /**
+   * Define se a conta não está expirada.
+   * <p>Permite definições de validade na conta.</p>
+   */
+  @Override
+  public boolean isAccountNonExpired() {
+      return true;
+  }
+
+  /**
+   * Define se a conta não está bloqueada
+   * <p>Permite defições de bloqueio após X tentativas de senha, por exemplo.</p>
+   */
+  @Override
+  public boolean isAccountNonLocked() {
+      return true;
+  }
+
+  /**
+   * Define se as senhas não estão expiradas,
+   * <p>Permite obrigar a troca de senhas a cada 90 dias, por exemplo.</p>
+   */
+  @Override
+  public boolean isCredentialsNonExpired() {
+      return true;
+  }
+
+  /**
+   * Define se a conta está habilitada.
+   * <p>Define se uma conta está ativa conforme flag de controle 'isActive'.</p>
+   */
+  @Override
+  public boolean isEnabled() {
+      return this.isActive;
   }
 }
