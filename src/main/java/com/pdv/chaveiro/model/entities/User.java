@@ -23,6 +23,7 @@ import com.pdv.chaveiro.model.enums.UserRole;
  * @version 1.0.0
  */
 @Entity
+@Table(name = "tb_users")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
