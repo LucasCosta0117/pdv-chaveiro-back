@@ -1,5 +1,7 @@
 package com.pdv.chaveiro.repository;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,6 +19,19 @@ import com.pdv.chaveiro.model.entities.Sale;
  */
 @Repository
 public interface SaleRepository extends JpaRepository<Sale, UUID>{
-  // Utilizando métodos nativos JpaRepository. Nenhum método adicional/customizado por enquanto
+  /**
+   * Retorna uma lista contendo todos as vendas ativas para a empresa informada.
+   * @param companyId Identificador da empresa.
+   * @return Uma lista {@link List} de objetos {@link Sale}.
+   */
+  List<Sale> findAllByCompanyIdAndIsDeletedFalse(UUID companyId);
+
+  /**
+   * Retorna uma {@link Sale} venda ativo e que pertence a empresa informada.
+   * @param id Identificador da venda.
+   * @param companyId Identificado da empresa.
+   * @return Uma lista {@link List} de objetos {@link Sale}.
+   */
+  Optional<Sale> findByIdAndCompanyIdAndIsDeletedFalse(UUID id, UUID companyId);
 }
 

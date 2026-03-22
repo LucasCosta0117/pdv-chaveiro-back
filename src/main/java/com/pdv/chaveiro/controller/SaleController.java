@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.pdv.chaveiro.dto.SaleRequestDTO;
 import com.pdv.chaveiro.model.entities.Sale;
+import com.pdv.chaveiro.model.entities.User;
 import com.pdv.chaveiro.service.SaleService;
 
 import lombok.RequiredArgsConstructor;
@@ -40,12 +42,13 @@ public class SaleController {
   /**
    * Endpoint GET para recuperar todas as vendas realizadas (Sales).
    * <p>Mapeado para: /api/sale/all</p>
-   * 
+   * @param loggedUser Usuário loggado e autenticado no sistema.
    * @return Uma lista {@link List} de objetos {@link Sale}.
    */
   @GetMapping("/all")
-  public List<Sale> findAll() {
-    return saleServ.getAll();
+  public ResponseEntity<List<Sale>> getAllJobs(@AuthenticationPrincipal User loggedUser) {
+    List<Sale> sales = saleServ.getAllByCompany(loggedUser.getCompany());
+    return ResponseEntity.ok(sales);
   }
 
   /**
@@ -53,27 +56,17 @@ public class SaleController {
    * <p>Mapeado para: /api/sale/save</p>
    * 
    * @param newSale Objeto JSON contendo os dados da nova venda.
+   * @param loggedUser Usuário loggado e autenticado no sistema.
    * @return A venda registrada no banco.
    */
   @PostMapping("/save")
-  public ResponseEntity<Sale> save(@RequestBody SaleRequestDTO newSale) {
-    Sale saleSaved = saleServ.saveSale(newSale);
-
-    return ResponseEntity.ok(saleSaved);
-  }
-
-  /**
-   * Endpoint DELETE para excluir uma venda do sistema.
-   * <p>Mapeado para: /api/sale/delete/{id}</p>
-   * 
-   * @param id ID do item à ser excluido.
-   * @return Retorna apenas status de sucesso 204 No Content.
-   */
-  @DeleteMapping("/delete/{id}")
-  public ResponseEntity<Void> delete(@PathVariable UUID id) {
-    saleServ.softDelete(id);
+  public ResponseEntity<Sale> save(
+    @RequestBody SaleRequestDTO newSale,
+    @AuthenticationPrincipal User loggedUser
+  ){
+    Sale saleSaved = saleServ.saveSale(newSale, loggedUser.getCompany());
     
-    return ResponseEntity.noContent().build();
+    return ResponseEntity.ok(saleSaved);
   }
 
   /**
@@ -82,12 +75,35 @@ public class SaleController {
    * 
    * @param id Identificador único da venda a ser editada.
    * @param editedSale Objeto JSON contendo os novos dados da venda.
+   * @param loggedUser Usuário loggado e autenticado no sistema.
    * @return A venda atualizada no banco.
    */
   @PutMapping("/update/{id}")
-  public ResponseEntity<Sale> update(@PathVariable UUID id, @RequestBody SaleRequestDTO editedSale) {
-    Sale saleUpdated = saleServ.updateSale(id, editedSale);
+  public ResponseEntity<Sale> update(
+    @PathVariable UUID id, 
+    @RequestBody SaleRequestDTO editedSale,
+    @AuthenticationPrincipal User loggedUser
+  ){
+    Sale saleUpdated = saleServ.updateSale(id, editedSale, loggedUser.getCompany());
     
     return ResponseEntity.ok(saleUpdated);
+  }
+
+  /**
+   * Endpoint DELETE para excluir uma venda do sistema.
+   * <p>Mapeado para: /api/sale/delete/{id}</p>
+   * 
+   * @param id ID do item à ser excluido.
+   * @param loggedUser Usuário loggado e autenticado no sistema.
+   * @return Retorna apenas status de sucesso 204 No Content.
+   */
+  @DeleteMapping("/delete/{id}")
+  public ResponseEntity<Void> delete(
+    @PathVariable UUID id,
+    @AuthenticationPrincipal User loggedUser
+  ) {
+    saleServ.softDelete(id, loggedUser.getCompany());
+
+    return ResponseEntity.noContent().build();
   }
 }

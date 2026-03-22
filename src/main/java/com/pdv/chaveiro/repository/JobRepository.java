@@ -1,5 +1,7 @@
 package com.pdv.chaveiro.repository;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,5 +19,18 @@ import com.pdv.chaveiro.model.entities.Job;
  */
 @Repository
 public interface JobRepository extends JpaRepository <Job, UUID>{
-  // Utilizando métodos nativos JpaRepository. Nenhum método adicional/customizado por enquanto
+  /**
+   * Retorna uma lista contendo todos os serviços ativos para a empresa informada.
+   * @param companyId Identificador da empresa.
+   * @return Uma lista {@link List} de objetos {@link Job}.
+   */
+  List<Job> findAllByCompanyIdAndIsDeletedFalse(UUID companyId);
+
+  /**
+   * Retorna um {@link Job} serviço ativo e que pertence a empresa informada.
+   * @param id Identificador do serviço.
+   * @param companyId Identificado da empresa.
+   * @return Uma lista {@link List} de objetos {@link Job}.
+   */
+  Optional<Job> findByIdAndCompanyIdAndIsDeletedFalse(UUID id, UUID companyId);
 }

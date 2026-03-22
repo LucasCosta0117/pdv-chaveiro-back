@@ -6,8 +6,8 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 import com.pdv.chaveiro.dto.JobRequestDTO;
+import com.pdv.chaveiro.model.entities.Company;
 import com.pdv.chaveiro.model.entities.Job;
-import com.pdv.chaveiro.model.entities.Product;
 import com.pdv.chaveiro.repository.JobRepository;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -37,52 +37,34 @@ public class JobService {
   }
 
   /**
-   * Retorna uma lista contendo todos os serviços (Jobs) cadastrados no sistema.
-   * 
+   * Retorna uma lista contendo todos os serviços (${@link Job}) ativos da empresa do usuário autenticado.
+   * @param company A empresa do usuário autenticado.
    * @return Uma lista {@link List} de objetos {@link Job}.
    */
-  public List<Job> getAll() {
-    return jobRepo.findAll();
+  public List<Job> getAllByCompany(Company company) {
+    return jobRepo.findAllByCompanyIdAndIsDeletedFalse(company.getId());
   }
 
   /**
-   * Retorna um objeto do tipo Job com base no ID fornecido.
-   * 
+   * Retorna um objeto do tipo {@link Job} com base no ID fornecido, validando a empresa e a permissão do usuário.
    * @param jobId   ID para identificação e busca do serviço.
-   * @return Um objeto {@link Product}.
-   * @throws EntityNotFoundException caso o produto não seja encontrado.
+   * @param company A empresa do utilizador autenticado.
+   * @return Um objeto {@link Job}.
+   * @throws EntityNotFoundException caso o serviço não seja encontrado ou pertença a outra empresa.
    */
-  public Job getById(UUID jobId) {
-    return jobRepo.findById(jobId).orElseThrow(
-      () -> new RuntimeException("Serviço não encontrado com o ID: " + jobId)
-    );
+  public Job getByIdAndCompany(UUID jobId, Company company) {
+    return jobRepo.findByIdAndCompanyIdAndIsDeletedFalse(jobId, company.getId())
+      .orElseThrow(() -> new EntityNotFoundException("Serviço não encontrado ou acesso negado."));
   }
 
   /**
-   * Realiza um soft delete do objeto no banco, de modo que é feito apenas um UPDATE na flag 'deleted' da entidade.
-   * <p>O método é transacional: se qualquer operação falhar, toda a transação é revertida.</p>
-   * 
-   * @param id ID do item à ser excluido.
+   * Persiste um novo serviço no banco de dados, vinculando-o à empresa atual.
+   * @param dto Objeto contendo os dados do novo serviço.
+   * @param company A empresa do utilizador que está a criar o registo.
+   * @return A entidade {@link Job} guardada.
    */
   @Transactional
-  public void softDelete(UUID id) {
-    Job job = jobRepo.findById(id)
-      .orElseThrow(() -> new EntityNotFoundException("Serviço não encontrado"));
-
-    job.setIsDeleted(true);
-
-    jobRepo.save(job);
-  }
-
-  /**
-   * Persiste um novo serviço no banco de dados.
-   * <p>O método é transacional: se qualquer operação falhar, toda a transação é revertida.</p>
-   * 
-   * @param dto - Objeto contendo os dados do novo serviço à ser salvo vindo do Fron-end.
-   * @return A entidade {@link Job} salva.
-   */
-  @Transactional
-  public Job saveJob(JobRequestDTO dto) {
+  public Job saveJob(JobRequestDTO dto, Company company) {
     Job job = new Job();
     job.setName(dto.getName());
     job.setCode(dto.getCode());
@@ -90,21 +72,22 @@ public class JobService {
     job.setSubcategory(dto.getSubcategory());
     job.setPrice(dto.getPrice());
     job.setIsActive(dto.getIsActive());
+    job.setCompany(company);
+    job.setIsDeleted(false);
 
     return jobRepo.save(job);
   }
 
   /**
-   * Atualizar os dados de um serviço existente.
-   * 
+   * Atualiza os dados de um serviço existente.
    * @param id Identificador do serviço.
    * @param dto Dados atualizados.
+   * @param company A empresa do utilizador.
    * @return A entidade {@link Job} atualizada.
    */
   @Transactional
-  public Job updateJob(UUID id, JobRequestDTO dto) {
-    Job job = jobRepo.findById(id)
-      .orElseThrow(() -> new RuntimeException("Serviço não encontrado para o ID: " + id));
+  public Job updateJob(UUID id, JobRequestDTO dto, Company company) {
+    Job job = this.getByIdAndCompany(id, company);
 
     job.setName(dto.getName());
     job.setCode(dto.getCode());
@@ -114,5 +97,17 @@ public class JobService {
     job.setIsActive(dto.getIsActive());
 
     return jobRepo.save(job);
+  }
+
+  /**
+   * Realiza um soft delete do objeto na base de dados (UPDATE na flag 'isDeleted').
+   * @param id ID do item a ser excluído.
+   * @param company A empresa do utilizador autenticado.
+   */
+  @Transactional
+  public void softDelete(UUID id, Company company) {
+    Job job = this.getByIdAndCompany(id, company);
+    job.setIsDeleted(true);
+    jobRepo.save(job);
   }
 }

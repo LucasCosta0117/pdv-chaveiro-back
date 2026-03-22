@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,7 +12,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.pdv.chaveiro.dto.JobRequestDTO;
 import com.pdv.chaveiro.model.entities.Job;
+import com.pdv.chaveiro.model.entities.User;
 import com.pdv.chaveiro.service.JobService;
+
+import jakarta.validation.Valid;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -47,26 +52,14 @@ public class JobController {
   /**
    * Endpoint GET para recuperar todos os serviços disponíveis (Jobs).
    * <p>Mapeado para: /api/job/all</p>
-   * 
+   * @param loggedUser Usuário loggado e autenticado no sistema.
    * @return Uma lista {@link List} de objetos {@link Job}.
    */
   @GetMapping("/all")
-  public List<Job> findAll() {
-    return jobServ.getAll();
-  }
-
-  /**
-   * Endpoint DELETE para excluir um serviço do sistema.
-   * <p>Mapeado para: /api/job/delete/{id}</p>
-   * 
-   * @param id ID do item à ser excluido.
-   * @return Retorna apenas status de sucesso 204 No Content.
-   */
-  @DeleteMapping("/delete/{id}")
-  public ResponseEntity<Void> delete(@PathVariable UUID id) {
-    jobServ.softDelete(id);
+  public ResponseEntity<List<Job>> getAllJobs(@AuthenticationPrincipal User loggedUser) {
+    List<Job> jobs = jobServ.getAllByCompany(loggedUser.getCompany());
     
-    return ResponseEntity.noContent().build();
+    return ResponseEntity.ok(jobs);
   }
 
   /**
@@ -74,13 +67,17 @@ public class JobController {
    * <p>Mapeado para: /api/job/save</p>
    * 
    * @param newJob Objeto JSON contendo os dados do novo serviço.
+   * @param loggedUser Usuário loggado e autenticado no sistema.
    * @return O serviço registrado no banco.
    */
   @PostMapping("/save")
-  public ResponseEntity<Job> save(@RequestBody JobRequestDTO newJob) {
-    Job jobSaved = jobServ.saveJob(newJob);
+  public ResponseEntity<Job> save(
+    @RequestBody @Valid JobRequestDTO dto, 
+    @AuthenticationPrincipal User loggedUser
+  ) {
+    Job newJob = jobServ.saveJob(dto, loggedUser.getCompany());
     
-    return ResponseEntity.ok(jobSaved);
+    return ResponseEntity.ok(newJob);
   }
 
   /**
@@ -89,12 +86,35 @@ public class JobController {
    * 
    * @param id Identificador único do serviço a ser editado.
    * @param editedJob Objeto JSON contendo os novos dados do serviço.
+   * @param loggedUser Usuário loggado e autenticado no sistema.
    * @return O serviço atualizado no banco.
    */
   @PutMapping("/update/{id}")
-  public ResponseEntity<Job> update(@PathVariable UUID id, @RequestBody JobRequestDTO editedJob) {
-    Job jobUpdated = jobServ.updateJob(id, editedJob);
+  public ResponseEntity<Job> update(
+    @PathVariable UUID id, 
+    @RequestBody @Valid JobRequestDTO editedJob,
+    @AuthenticationPrincipal User loggedUser
+  ) {
+    Job jobUpdated = jobServ.updateJob(id, editedJob, loggedUser.getCompany());
     
     return ResponseEntity.ok(jobUpdated);
+  }
+
+  /**
+   * Endpoint DELETE para excluir um serviço do sistema.
+   * <p>Mapeado para: /api/job/delete/{id}</p>
+   * 
+   * @param id ID do item à ser excluido.
+   * @param loggedUser Usuário loggado e autenticado no sistema.
+   * @return Retorna apenas status de sucesso 204 No Content.
+   */
+  @DeleteMapping("/delete/{id}")
+  public ResponseEntity<Void> delete(
+    @PathVariable UUID id, 
+    @AuthenticationPrincipal User loggedUser
+  ) {
+    jobServ.softDelete(id, loggedUser.getCompany());
+    
+    return ResponseEntity.noContent().build();
   }
 }

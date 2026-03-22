@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.pdv.chaveiro.dto.SaleRequestDTO;
+import com.pdv.chaveiro.model.entities.Company;
 import com.pdv.chaveiro.model.entities.Job;
 import com.pdv.chaveiro.model.entities.Product;
 import com.pdv.chaveiro.model.entities.Sale;
@@ -45,12 +46,24 @@ public class SaleService {
   private final JobService jobServ;
 
   /**
-   * Retorna uma lista contendo todos os serviços (Jobs) cadastrados no sistema.
-   * 
+   * Retorna uma lista contendo todos as vendas (${@link Sale}) ativas da empresa do usuário autenticado.
+   * @param company A empresa do usuário autenticado.
    * @return Uma lista {@link List} de objetos {@link Sale}.
    */
-  public List<Sale> getAll() {
-    return saleRepo.findAll();
+  public List<Sale> getAllByCompany(Company company) {
+    return saleRepo.findAllByCompanyIdAndIsDeletedFalse(company.getId());
+  }
+
+  /**
+   * Retorna um objeto do tipo ${@link Sale} com base no ID fornecido, validando a empresa e a permissão do usuário.
+   * @param saleId   ID para identificação e busca da venda.
+   * @param company A empresa do utilizador autenticado.
+   * @return Um objeto {@link Sale}.
+   * @throws EntityNotFoundException caso a venda não seja encontrado ou pertença a outra empresa.
+   */
+  public Sale getByIdAndCompany(UUID saleId, Company company) {
+    return saleRepo.findByIdAndCompanyIdAndIsDeletedFalse(saleId, company.getId())
+      .orElseThrow(() -> new EntityNotFoundException("Venda não encontrada ou acesso negado."));
   }
 
   /**
@@ -58,11 +71,12 @@ public class SaleService {
    * <p>O método é transacional: se qualquer operação falhar, toda a transação é revertida.</p>
    * 
    * @param dto Objeto contendo os dados da nova venda vindos do front-end.
+   * @param company A empresa do utilizador que está a criar o registo.
    * @return A entidade {@link Sale} salva, incluindo seus itens e pagamentos.
    */
   @Transactional
-  public Sale saveSale(SaleRequestDTO dto) {
-    Sale sale = new Sale(); // Venda principal
+  public Sale saveSale(SaleRequestDTO dto, Company company) {
+    Sale sale = new Sale();
 
     sale.setSubtotal(dto.getSubtotal());
     sale.setTotalDiscount(dto.getDiscounts());
@@ -70,7 +84,8 @@ public class SaleService {
     sale.setStatus(dto.getStatus());
     sale.setFiscalNumber(null); // @todo valor null temporário, o sistema de notas será implementado futuramente
     sale.setSellerName(dto.getSellerName()); // @todo valor null temporário, o sistema de usuários será implementado futuramente
-
+    sale.setCompany(company);
+    sale.setIsDeleted(false);
     sale.setCode(this.createNewSaleCode());
 
     // Cria e associa os itens da venda
@@ -79,10 +94,10 @@ public class SaleService {
 
       // Validações/Atualizações para quando o item vendido é um 'Produto'
       if ("products".equals(i.getEntity())) {
-        productServ.updateProductStock(i.getId(), i.getQuantity());
+        productServ.updateProductStock(i.getId(), i.getQuantity(), company);
       }
 
-      item.setItemName(this.findItemName(i.getId(), i.getEntity()));
+      item.setItemName(this.findItemName(i.getId(), i.getEntity(), company));
       item.setQuantity(i.getQuantity());
       item.setUnitPrice(i.getUnit_price());
       item.setDiscount(i.getDiscount());
@@ -109,35 +124,33 @@ public class SaleService {
   }
 
   /**
-   * Realiza um soft delete do objeto no banco, de modo que é feito apenas um UPDATE na flag 'deleted' da entidade.
-   * <p>O método é transacional: se qualquer operação falhar, toda a transação é revertida.</p>
-   * 
-   * @param id ID do item à ser excluido.
+   * Atualiza os dados de uma venda existente
+   * @param id Identificador da venda.
+   * @param dto Dados atualizados.
+   * @param company A empresa do utilizador.
+   * @return A entidade {@link Sale} atualizada.
    */
   @Transactional
-  public void softDelete(UUID id) {
+  public Sale updateSale(UUID id, SaleRequestDTO dto, Company company) {
+    Sale sale = this.getByIdAndCompany(id, company);
+    // @TODO - Passar apenas as propriedades que podem ser atualizadas em uma venda.
+
+    return saleRepo.save(sale);
+  }
+
+  /**
+   * Realiza um soft delete do objeto no banco (UPDATE na flag 'isDeleted').
+   * @param id ID do item à ser excluido.
+   * @param company A empresa do utilizador autenticado.
+   */
+  @Transactional
+  public void softDelete(UUID id, Company company) {
     Sale sale = saleRepo.findById(id)
       .orElseThrow(() -> new EntityNotFoundException("Venda não encontrada"));
 
     sale.setIsDeleted(true);
 
     saleRepo.save(sale);
-  }
-
-  /**
-   * Lógica de negócio para atualizar uma venda existente.
-   * * @param id Identificador da venda.
-   * @param dto Dados atualizados.
-   * @return A venda atualizada.
-   */
-  @Transactional
-  public Sale updateSale(UUID id, SaleRequestDTO dto) {
-    Sale sale = saleRepo.findById(id)
-      .orElseThrow(() -> new RuntimeException("Venda não encontrada com o ID: " + id));
-
-    // @TODO - Passar corretamente os valores do dto para a entidade encontrada.
-
-    return saleRepo.save(sale);
   }
 
   /**
@@ -185,16 +198,17 @@ public class SaleService {
    * @param itemId   O {@link UUID} identificador único do item no banco de dados.
    * @param itemType Uma {@link String} indicando a categoria do item (ex: "product" para produtos, 
    * qualquer outro valor será tratado como serviço/job).
+   * @param company A empresa do utilizador que está a criar o registo.
    * @return O nome do item encontrado (propriedade {@code name} da entidade).
    * @throws RuntimeException Caso o item não seja encontrado em seus respectivos repositórios.
    */
-  private String findItemName(UUID itemId, String itemType) {
+  private String findItemName(UUID itemId, String itemType, Company company) {
     if ("products".equals(itemType)) {
-        Product product = productServ.getById(itemId);
-        return product.getName();
-    } 
+      Product product = productServ.getByIdAndCompany(itemId, company);
+      return product.getName();
+    }
     
-    Job job = jobServ.getById(itemId);
+    Job job = jobServ.getByIdAndCompany(itemId, company);
     return job.getName();
   }
 }

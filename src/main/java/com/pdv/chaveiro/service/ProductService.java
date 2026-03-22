@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 import com.pdv.chaveiro.dto.ProductRequestDTO;
+import com.pdv.chaveiro.model.entities.Company;
 import com.pdv.chaveiro.model.entities.Product;
 import com.pdv.chaveiro.repository.ProductRepository;
 
@@ -38,12 +39,90 @@ public class ProductService {
   }
 
   /**
-   * Retorna uma lista contendo todos os produtos (Products) cadastrados no sistema.
-   * 
+   * Retorna uma lista contendo todos os produtos (${@link Product}) ativos da empresa do usuário autenticado.
+   * @param company A empresa do usuário autenticado.
    * @return Uma lista {@link List} de objetos {@link Product}.
    */
-  public List<Product> getAll() {
-    return productRepo.findAll();
+  public List<Product> getAllByCompany(Company company) {
+    return productRepo.findAllByCompanyIdAndIsDeletedFalse(company.getId());
+  }
+
+  /**
+   * Retorna um objeto do tipo {@link Product} com base no ID fornecido, validando a empresa e a permissão do usuário.
+   * @param productId ID para identificação e busca do produto.
+   * @param company   A empresa do utilizador autenticado.
+   * @return Um objeto {@link Product}.
+   * @throws EntityNotFoundException caso o produto não seja encontrado ou pertença a outra empresa.
+   */
+  public Product getByIdAndCompany(UUID productId, Company company) {
+    return productRepo.findByIdAndCompanyIdAndIsDeletedFalse(productId, company.getId())
+      .orElseThrow(() -> new EntityNotFoundException("Produto não encontrado ou acesso negado."));
+  }
+
+  /**
+   * Persiste um novo produto no banco de dados.
+   * <p>O método é transacional: se qualquer operação falhar, toda a transação é revertida.</p>
+   * 
+   * @param dto Objeto contendo os dados do novo produto vindo do front-end.
+   * @param company A empresa do utilizador que está a criar o registo.
+   * @return A entidade {@link Product} salvo.
+   */
+  @Transactional
+  public Product saveProduct(ProductRequestDTO dto, Company company) {
+    Product product = new Product();
+    product.setName(dto.getName());
+    product.setBrand(dto.getBrand());
+    product.setCode(dto.getCode());
+    product.setDepartment(dto.getDepartment());
+    product.setCategory(dto.getCategory());
+    product.setSubcategory(dto.getSubcategory());
+    product.setPrice(dto.getPrice());
+    product.setStock(dto.getStock());
+    product.setImgUrl(dto.getImgUrl());
+    product.setCanSale(dto.getCanSale());
+    product.setIsActive(dto.getIsActive());
+    product.setCompany(company);
+    product.setIsDeleted(false);
+
+    return productRepo.save(product);
+  }
+
+  /**
+   * Atualizar os dados de um produto existente.
+   * @param id Identificador do produto.
+   * @param dto Dados atualizados.
+   * @param company A empresa do utilizador.
+   * @return A entidade {@link Product} atualizada.
+   */
+  @Transactional
+  public Product updateProduct(UUID id, ProductRequestDTO dto, Company company) {
+    Product product = this.getByIdAndCompany(id, company);
+
+    product.setName(dto.getName());
+    product.setBrand(dto.getBrand());
+    product.setCode(dto.getCode());
+    product.setDepartment(dto.getDepartment());
+    product.setCategory(dto.getCategory());
+    product.setSubcategory(dto.getSubcategory());
+    product.setPrice(dto.getPrice());
+    product.setStock(dto.getStock());
+    product.setImgUrl(dto.getImgUrl());
+    product.setCanSale(dto.getCanSale());
+    product.setIsActive(dto.getIsActive());
+
+    return productRepo.save(product);
+  }
+
+  /**
+   * Realiza um soft delete do objeto no banco, de modo que é feito apenas um UPDATE na flag 'deleted' da entidade.
+   * @param id ID do item à ser excluido.
+   * @param company A empresa do utilizador autenticado.
+   */
+  @Transactional
+  public void softDelete(UUID id, Company company) {
+    Product product = this.getByIdAndCompany(id, company);;
+    product.setIsDeleted(true);
+    productRepo.save(product);
   }
 
   /**
@@ -54,12 +133,8 @@ public class ProductService {
    * @param requestProductQty Quantidade a ser deduzida do estoque do produto.
    * @return A entidade {@link Product} salva, com o valor de 'estoque' atualizado.
    */
-  public Product updateProductStock(UUID productId, int requestProductQty) {
-    Product product = productRepo.findById(productId).orElseThrow(() -> {
-      log.error("Produto não encontrado com ID: {}", productId);
-      
-      return new RuntimeException("Produto não encontrado com ID: " + productId);
-    });
+  public Product updateProductStock(UUID productId, int requestProductQty, Company company) {
+    Product product = this.getByIdAndCompany(productId, company);
 
     if (product.getStock() < requestProductQty) {
       log.warn("Estoque insuficiente para '{}' - disponível: {} un, solicitado: {} un",
@@ -72,88 +147,6 @@ public class ProductService {
 
     int newStock = product.getStock() - requestProductQty;
     product.setStock(newStock);
-
-    return productRepo.save(product);
-  }
-
-  /**
-   * Retorna um objeto do tipo Product com base no ID fornecido.
-   * 
-   * @param productId   ID para identificação e busca do produto.
-   * @return Um objeto {@link Product}.
-   * @throws EntityNotFoundException caso o produto não seja encontrado.
-   */
-  public Product getById(UUID productId) {
-    return productRepo.findById(productId).orElseThrow(
-      ()-> new RuntimeException("Produto não encontrado com o ID: " + productId)
-    );
-  }
-
-  /**
-   * Realiza um soft delete do objeto no banco, de modo que é feito apenas um UPDATE na flag 'deleted' da entidade.
-   * <p>O método é transacional: se qualquer operação falhar, toda a transação é revertida.</p>
-   * 
-   * @param id ID do item à ser excluido.
-   */
-  @Transactional
-  public void softDelete(UUID id) {
-    Product product = productRepo.findById(id)
-      .orElseThrow(() -> new EntityNotFoundException("Produto não encontrado"));
-
-    product.setIsDeleted(true);
-
-    productRepo.save(product);
-  }
-
-  /**
-   * Persiste um novo produto no banco de dados.
-   * <p>O método é transacional: se qualquer operação falhar, toda a transação é revertida.</p>
-   * 
-   * @param dto Objeto contendo os dados do novo produto vindo do front-end.
-   * @return A entidade {@link Product} salvo.
-   */
-  @Transactional
-  public Product saveProduct(ProductRequestDTO dto) {
-    Product product = new Product();
-
-    product.setName(dto.getName());
-    product.setBrand(dto.getBrand());
-    product.setCode(dto.getCode());
-    product.setDepartment(dto.getDepartment());
-    product.setCategory(dto.getCategory());
-    product.setSubcategory(dto.getSubcategory());
-    product.setPrice(dto.getPrice());
-    product.setStock(dto.getStock());
-    product.setImgUrl(dto.getImgUrl());
-    product.setCanSale(dto.getCanSale());
-    product.setIsActive(dto.getIsActive());
-
-    return productRepo.save(product);
-  }
-
-  /**
-   * Atualizar os dados de um produto existente.
-   * 
-   * @param id Identificador do produto.
-   * @param dto Dados atualizados.
-   * @return A entidade {@link Product} atualizada.
-   */
-  @Transactional
-  public Product updateProduct(UUID id, ProductRequestDTO dto) {
-    Product product = productRepo.findById(id)
-      .orElseThrow(() -> new RuntimeException("Produto não encontrado com o ID: " + id));
-
-    product.setName(dto.getName());
-    product.setBrand(dto.getBrand());
-    product.setCode(dto.getCode());
-    product.setDepartment(dto.getDepartment());
-    product.setCategory(dto.getCategory());
-    product.setSubcategory(dto.getSubcategory());
-    product.setPrice(dto.getPrice());
-    product.setStock(dto.getStock());
-    product.setImgUrl(dto.getImgUrl());
-    product.setCanSale(dto.getCanSale());
-    product.setIsActive(dto.getIsActive());
 
     return productRepo.save(product);
   }
