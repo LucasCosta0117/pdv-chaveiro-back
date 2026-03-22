@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import org.hibernate.annotations.SQLRestriction;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.pdv.chaveiro.model.enums.SaleStatus;
 
@@ -53,6 +54,7 @@ public class Sale {
    */
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "company_id", nullable = false)
+  @JsonIgnore
   private Company company;
 
   /**
