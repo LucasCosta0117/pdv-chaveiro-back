@@ -77,7 +77,7 @@ public class TokenService {
    * * @return Um objeto {@link Instant} com o exato momento de expiração no fuso horário local.
    */
   private Instant genExpirationDate() {
-    // Retorna o horário atual + 2 horas no fuso horário do Brasil (UTC-3)
-    return LocalDateTime.now().plusHours(2).toInstant(ZoneOffset.of("-03:00"));
+    // Retorna o horário atual + 12 horas no fuso horário do Brasil (UTC-3) - Ps.: Futuramente implementar Access Token + Refresh Token, garantindo segurança. 
+    return LocalDateTime.now().plusHours(12).toInstant(ZoneOffset.of("-03:00"));
   }
 }
