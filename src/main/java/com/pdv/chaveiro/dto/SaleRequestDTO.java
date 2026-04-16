@@ -5,23 +5,19 @@ import java.util.List;
 
 import com.pdv.chaveiro.model.enums.SaleStatus;
 
-import lombok.Data;
-
 /**
  * DTO para receber os dados de uma nova venda enviados pelo front-end.
- * 
- * @author Lucas Costa
+ * * @author Lucas Costa
  * @version 1.0.0
  */
-@Data
-public class SaleRequestDTO {
-  private BigDecimal subtotal;
-  private BigDecimal discounts;
-  private BigDecimal total;
-  private String sellerName;
-  private SaleStatus status;
-  private String fiscalNumber;
-  private String saleNotes;
-  private List<PaymentDTO> payment;
-  private List<ItemDTO> items;
-}
+public record SaleRequestDTO(
+    BigDecimal subtotal,
+    BigDecimal discounts,
+    BigDecimal total,
+    String sellerName,
+    SaleStatus status,
+    String fiscalNumber,
+    String saleNotes,
+    List<PaymentDTO> payment,
+    List<ItemDTO> items
+) {}

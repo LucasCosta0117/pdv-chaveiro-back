@@ -15,6 +15,7 @@ import com.pdv.chaveiro.model.entities.Product;
 import com.pdv.chaveiro.model.entities.Sale;
 import com.pdv.chaveiro.model.entities.SaleItem;
 import com.pdv.chaveiro.model.entities.SalePayment;
+import com.pdv.chaveiro.model.enums.SaleStatus;
 import com.pdv.chaveiro.repository.SaleRepository;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -78,19 +79,19 @@ public class SaleService {
   public Sale saveSale(SaleRequestDTO dto, Company company) {
     Sale sale = new Sale();
 
-    sale.setSubtotal(dto.getSubtotal());
-    sale.setTotalDiscount(dto.getDiscounts());
-    sale.setTotal(dto.getTotal());
-    sale.setStatus(dto.getStatus());
-    sale.setFiscalNumber(dto.getFiscalNumber());
-    sale.setSaleNotes(dto.getSaleNotes());
-    sale.setSellerName(dto.getSellerName());
+    sale.setSubtotal(dto.subtotal());
+    sale.setTotalDiscount(dto.discounts());
+    sale.setTotal(dto.total());
+    sale.setStatus(dto.status());
+    sale.setFiscalNumber(dto.fiscalNumber());
+    sale.setSaleNotes(dto.saleNotes());
+    sale.setSellerName(dto.sellerName());
     sale.setCompany(company);
     sale.setIsDeleted(false);
     sale.setCode(this.createNewSaleCode());
 
     // Cria e associa os itens da venda
-    List<SaleItem> items = dto.getItems().stream().map(i -> {
+    List<SaleItem> items = dto.items().stream().map(i -> {
       SaleItem item = new SaleItem();
 
       // Validações/Atualizações para quando o item vendido é um 'Produto'
@@ -110,7 +111,7 @@ public class SaleService {
     sale.setItems(items);
 
     // Cria e associa os pagamentos
-    List<SalePayment> payments = dto.getPayment().stream().map(p -> {
+    List<SalePayment> payments = dto.payment().stream().map(p -> {
       SalePayment pay = new SalePayment();
       pay.setMethod(p.getMethod());
       pay.setAmount(p.getAmount());
@@ -134,7 +135,26 @@ public class SaleService {
   @Transactional
   public Sale updateSale(UUID id, SaleRequestDTO dto, Company company) {
     Sale sale = this.getByIdAndCompany(id, company);
-    // @TODO - Passar apenas as propriedades que podem ser atualizadas em uma venda.
+
+    if (sale.getStatus() == SaleStatus.PENDING) {
+      // Regra para o fiscal_number
+      if (dto.fiscalNumber() != null && !dto.fiscalNumber().isBlank() && !dto.fiscalNumber().equals(sale.getFiscalNumber())) {
+        sale.setFiscalNumber(dto.fiscalNumber());
+      }
+      // Regra para o sale_notes
+      if (dto.saleNotes() != null && !dto.saleNotes().isBlank() && !dto.saleNotes().equals(sale.getSaleNotes())) {
+        sale.setSaleNotes(dto.saleNotes());
+      }
+      // Regra para o status
+      if (sale.getStatus() != dto.status()) {
+        sale.setStatus(dto.status());
+      }
+    } else if (sale.getStatus() == SaleStatus.COMPLETED) {
+      // Regra para o status
+      if (sale.getStatus() != dto.status()) {
+        sale.setStatus(dto.status());
+      }
+    }
 
     return saleRepo.save(sale);
   }
