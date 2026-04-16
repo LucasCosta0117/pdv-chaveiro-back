@@ -82,8 +82,9 @@ public class SaleService {
     sale.setTotalDiscount(dto.getDiscounts());
     sale.setTotal(dto.getTotal());
     sale.setStatus(dto.getStatus());
-    sale.setFiscalNumber(null); // @todo valor null temporário, o sistema de notas será implementado futuramente
-    sale.setSellerName(dto.getSellerName()); // @todo valor null temporário, o sistema de usuários será implementado futuramente
+    sale.setFiscalNumber(dto.getFiscalNumber());
+    sale.setSaleNotes(dto.getSaleNotes());
+    sale.setSellerName(dto.getSellerName());
     sale.setCompany(company);
     sale.setIsDeleted(false);
     sale.setCode(this.createNewSaleCode());

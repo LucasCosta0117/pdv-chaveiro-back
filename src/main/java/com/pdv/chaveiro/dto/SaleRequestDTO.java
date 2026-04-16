@@ -20,6 +20,8 @@ public class SaleRequestDTO {
   private BigDecimal total;
   private String sellerName;
   private SaleStatus status;
+  private String fiscalNumber;
+  private String saleNotes;
   private List<PaymentDTO> payment;
   private List<ItemDTO> items;
 }

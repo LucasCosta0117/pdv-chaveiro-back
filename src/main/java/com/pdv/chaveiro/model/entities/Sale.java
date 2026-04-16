@@ -95,10 +95,10 @@ public class Sale {
   private String fiscalNumber;
 
   /**
-   * Número da Nota fiscal.
+   * Observações da venda.
    */
-  @Column(name="fiscal_notes")
-  private String fiscalNotes;
+  @Column(name="sale_notes")
+  private String saleNotes;
 
   /**
    * Usuário (ou vendedor) que realizou a venda.
