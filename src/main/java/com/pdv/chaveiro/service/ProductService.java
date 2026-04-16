@@ -79,7 +79,6 @@ public class ProductService {
     product.setPrice(dto.getPrice());
     product.setStock(dto.getStock());
     product.setImgUrl(dto.getImgUrl());
-    product.setCanSale(dto.getCanSale());
     product.setIsActive(dto.getIsActive());
     product.setCompany(company);
     product.setIsDeleted(false);
@@ -107,7 +106,6 @@ public class ProductService {
     product.setPrice(dto.getPrice());
     product.setStock(dto.getStock());
     product.setImgUrl(dto.getImgUrl());
-    product.setCanSale(dto.getCanSale());
     product.setIsActive(dto.getIsActive());
 
     return productRepo.save(product);

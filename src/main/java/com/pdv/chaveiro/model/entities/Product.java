@@ -110,12 +110,6 @@ public class Product {
   private String imgUrl;
 
   /**
-   * Indica se o produto está disponível para venda no PDV.
-   */
-  @Column(name = "can_sale")
-  private Boolean canSale;
-
-  /**
    * Indica se o produto está ativo no PDV.
    */
   @Column(name = "is_active", nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")

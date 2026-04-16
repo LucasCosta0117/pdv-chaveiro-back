@@ -20,6 +20,5 @@ public class ProductRequestDTO {
   private BigDecimal price;
   private Integer stock;
   private String imgUrl;
-  private Boolean canSale;
   private Boolean isActive;
 }
